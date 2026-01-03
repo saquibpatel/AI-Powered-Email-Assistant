@@ -1,5 +1,6 @@
 package com.email.writer.service.impl;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.email.writer.helper.GeminiHelper;
@@ -31,14 +32,14 @@ public class EmailGeneratorServiveImpl implements EmailGeneratorService {
 		log.info("Received api Request in EmailGeneratorServiveImpl | apiRequest: {}", apiRequest);
 		
 	
-		String httpresponse = httpEngine.makeHttpCall(apiRequest);
+		ResponseEntity<String> httpresponse = httpEngine.makeHttpCall(apiRequest);
 		log.info("HttpResponse received in EmailGeneratorServiveImpl | httpresponse: {}", httpresponse);
 		
-		return null;
+		String response = geminiHelper.handleGeminiResponse(httpresponse);
+		log.info("parsed Response received in EmailGeneratorServiveImpl | response: {}", response);
+		
+		
+		return response;
 	}
 
-	
-		
-	
-	
 }

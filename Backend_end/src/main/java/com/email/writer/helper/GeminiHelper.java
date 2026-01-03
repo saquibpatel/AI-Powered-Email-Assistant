@@ -6,13 +6,17 @@ import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.reactive.function.client.WebClient;
 import com.email.writer.api.req.Content;
 import com.email.writer.api.req.GeminiRequest;
 import com.email.writer.api.req.Part;
 import com.email.writer.http.ApiRequest;
 import com.email.writer.pojo.EmailRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class GeminiHelper {
+	
+	private final ObjectMapper objectMapper;
 
-	private  String geminiApiUrl = "url";
+	private  String geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+   
 
 	public ApiRequest prepareHttpRequest(EmailRequest emailRequest) {
 		log.info("preparing httpRequest...| EmailRequest: {}", emailRequest);
@@ -32,7 +40,7 @@ public class GeminiHelper {
 		
 		//set header
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("x-goog-api-key","api key");
+		headers.set("x-goog-api-key","AIzaSyDH5pieQ7y2JUHTQnDAlFuif0uYXykSGeI");
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		
 		//set body
@@ -69,6 +77,34 @@ public class GeminiHelper {
 		
 	return prompt.toString();
 }
+
+	public String handleGeminiResponse(ResponseEntity<String> httpresponse) {
+		log.info("Handling GeminiResponse ... | httpresponse: {}", httpresponse);
+		
+		String responseBody = httpresponse.getBody();
+		
+		try {
+			JsonNode root = objectMapper.readTree(responseBody);
+			
+			String response = root.path("candidates")
+				.path(0)
+				.path("content")
+				.path("parts")
+				.path(0)
+				.path("text")
+				.asText();
+			
+			log.info("Returning Gemini response | response: {}",response );
+			return response;
+			
+		} catch (JsonProcessingException e) {
+			
+			throw new RuntimeException("Fail to parse  Gemini response", e);
+			
+		}
+		
+		
+	}
 	
 	
 }

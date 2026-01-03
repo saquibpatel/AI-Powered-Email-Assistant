@@ -1,6 +1,5 @@
 package com.email.writer.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +20,10 @@ public class EmailGeneratorController {
 	
 	
 	@PostMapping("/generate")
-	public ResponseEntity<String> gererateEmail(@RequestBody EmailRequest emailRequest){
+	public String gererateEmail(@RequestBody EmailRequest emailRequest){
 		
 		String response = emailGeneratorService.generateEmail( emailRequest);
-		return ResponseEntity.ok(response);
+		return response;
 	}
-	
-	
 	
 }

@@ -1,12 +1,11 @@
 package com.email.writer.http;
 
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 
 @Component
@@ -16,16 +15,16 @@ public class HttpEngine {
 	
 	private final WebClient webClient;
 	
-	public String makeHttpCall(ApiRequest apiRequest) {
+	public ResponseEntity<String> makeHttpCall(ApiRequest apiRequest) {
 		
 	log.info("Making httpcall...| apiRequest: {}", apiRequest);
 		
-		  String response = webClient.method(apiRequest.getHttpMethod())
+		   ResponseEntity<String> response = webClient.method(apiRequest.getHttpMethod())
 				 .uri(apiRequest.getUrl())
 				 .headers(header -> header.addAll(apiRequest.getHeaders()))
 				 .bodyValue(apiRequest.getBody())
 				 .retrieve()
-				 .bodyToMono(String.class)
+				 .toEntity(String.class)
 				 .block();
 				 
 				 
