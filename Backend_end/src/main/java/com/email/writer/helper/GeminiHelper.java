@@ -3,12 +3,13 @@ package com.email.writer.helper;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+
 import com.email.writer.api.req.Content;
 import com.email.writer.api.req.GeminiRequest;
 import com.email.writer.api.req.Part;
@@ -27,10 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 public class GeminiHelper {
 	
 	private final ObjectMapper objectMapper;
-
-	private  String geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-
-   
+	
+	@Value("${gemini.api.url}")
+	private String geminiUrl;
+	
+	@Value("${gemini.api.key}")
+	private String geminiApiKey;
 
 	public ApiRequest prepareHttpRequest(EmailRequest emailRequest) {
 		log.info("preparing httpRequest...| EmailRequest: {}", emailRequest);
@@ -40,7 +43,7 @@ public class GeminiHelper {
 		
 		//set header
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("x-goog-api-key","AIzaSyDH5pieQ7y2JUHTQnDAlFuif0uYXykSGeI");
+		headers.set("x-goog-api-key",geminiApiKey);
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		
 		//set body
@@ -58,7 +61,7 @@ public class GeminiHelper {
 		
 		apiRequest.setHttpMethod(HttpMethod.POST);
 		apiRequest.setHeaders(headers);
-		apiRequest.setUrl(geminiApiUrl);
+		apiRequest.setUrl(geminiUrl);
 		apiRequest.setBody(geminiRequest);
 		
 		log.info("Returning gemini ApiRequest | ApiRequest; {}", apiRequest);
@@ -68,7 +71,7 @@ public class GeminiHelper {
 	private String buildPrompt(EmailRequest emailRequest) {
 
 		StringBuilder prompt = new StringBuilder();			
-		prompt.append("Generate professional email reply for the following email:");
+		prompt.append("Generate a single email reply for the following email:");
 								
 		if(emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()) {
 			prompt.append(" Use a ").append(emailRequest.getTone()).append(" tone.");
